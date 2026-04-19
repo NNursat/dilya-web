@@ -48,5 +48,7 @@ class HabitLog(models.Model):
     date = models.DateField(default=timezone.now)
     value = models.IntegerField(default=1)
     is_completed = models.BooleanField(default=True)
-
+    
+    class Meta:
+        unique_together = ('habit', 'date')
 

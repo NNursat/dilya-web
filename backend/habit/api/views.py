@@ -38,6 +38,10 @@ class HabitViewSet(viewsets.ModelViewSet):
         return Habit.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):
+        category = serializer.validated_data.get('category')
+        if category and category.user != self.request.user:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError("Это не ваша категория!")
         serializer.save(user=self.request.user)
 
     @action(detail=True, methods=['post'])

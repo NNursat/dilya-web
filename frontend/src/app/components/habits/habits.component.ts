@@ -92,44 +92,27 @@ export class HabitsComponent implements OnInit {
     });
   }
 
-  createHabit(): void {
-    if (!this.newHabit.name.trim()) {
-      alert('Please enter a habit name');
-      return;
+// Создание
+createHabit(): void {
+  this.apiService.createHabit(this.newHabit).subscribe({
+    next: (res) => {
+      this.habits.push(res); // Добавляем в список сразу
+      this.showCreateForm = false;
+      this.newHabit = { name: '', frequency: 'daily', goal: 1 }; // Сброс
+    },
+    error: () => alert('Ошибка при создании')
+  });
+}
+
+// Удаление
+deleteHabit(habit: any): void {
+  if (!confirm('Удалить?')) return;
+  this.apiService.deleteHabit(habit.id).subscribe({
+    next: () => {
+      this.habits = this.habits.filter(h => h.id !== habit.id); // Удаляем из списка
     }
-
-    this.apiService.createHabit(this.newHabit).subscribe({
-      next: (createdHabit) => {
-        console.log('Habit created:', createdHabit);
-        this.habits.push(createdHabit);
-        this.resetCreateForm();
-        this.showCreateForm = false;
-      },
-      error: (error) => {
-        console.error('Error creating habit:', error);
-        alert('Failed to create habit. Please try again.');
-      }
-    });
-  }
-
-  deleteHabit(habit: Habit): void {
-    if (!habit.id) return;
-    
-    if (!confirm(`Are you sure you want to delete "${habit.name}"?`)) {
-      return;
-    }
-
-    this.apiService.deleteHabit(habit.id).subscribe({
-      next: () => {
-        console.log('Habit deleted');
-        this.habits = this.habits.filter(h => h.id !== habit.id);
-      },
-      error: (error) => {
-        console.error('Error deleting habit:', error);
-        alert('Failed to delete habit. Please try again.');
-      }
-    });
-  }
+  });
+}
 
   toggleCreateForm(): void {
     this.showCreateForm = !this.showCreateForm;
